@@ -27,8 +27,8 @@
 %                                     also used for the TOC unless
 %                                     \toctitle is used
 %
-\author{Xiangyu Ju \and Quan Chen \and
-Zhenning Wang \and Minyi Guo \and Guang R. Gao}
+\author{Xiangyu Ju \inst{1} \and Quan Chen \inst{1} \and
+Zhenning Wang \inst{1} \and Minyi Guo \inst{1} \and Guang R. Gao \inst{2}}
 %
 \authorrunning{Xiangyu Ju et al.} % abbreviated author list (for running head)
 %
@@ -36,17 +36,20 @@ Zhenning Wang \and Minyi Guo \and Guang R. Gao}
 \tocauthor{Quan Chen, Zhenning Wang, Minyi Guo, Guang R. Gao }
 
 \institute{Shanghai Jiao Tong University, Shanghai 200240, China,\\
+\and
 University of Delaware, Newark 19716, USA \\
 \email{juxiangyu@sjtu.edu.cn}}
 
 \maketitle              % typeset the title of the contribution
 \vspace{-20pt}
 \begin{abstract}
-Collaborative filtering, widely used in big data applications, is a common technique in recommender systems. Most big data systems (e.g. Hadoop MR, Spark) use alternating least square (ALS) as the training algorithm for collaborative filtering. Due to the high computation complexity, ALS faces severe performance challenges when data become dramatically larger and sparser. Gradient descent is an alternative training algorithm with lower computation complexity. However, it requires fine-grain operations and large scale data movements. In this paper, we proposed dataflow based collaborative filtering (DCF) training algorithm. DCF exploits fine-grain asynchronous feature of dataflow model to achieve significant performance gain. With our method, the excessive overhand due to fine-grain overhead of dependency checking and high communication complexity can be optimized by dummy edge and multicasting techniques. We evaluate our algorithm and contrasts on 1 master + 10 slaves cluster. The experiment results show that DCF achieves 23x speedup over ALS on Spark and 18x speedup over gradient descent on Graphlab in public datasets.
+Collaborative filtering, widely used in big data applications, is a common technique in recommender systems. Most big data systems (e.g. Hadoop MR, Spark) use alternating least square (ALS) as the training algorithm for collaborative filtering. Due to the high computation complexity, ALS faces severe performance challenges when data become dramatically larger and sparser. Gradient descent is an alternative training algorithm with lower computation complexity. However, it requires fine-grain operations and large scale data movements. In this paper, we proposed dataflow based collaborative filtering (DCF) training algorithm. DCF exploits fine-grain asynchronous feature of dataflow model to achieve significant performance gain. With our method, the fine-grain overhead of dependency checking and high communication complexity can be optimized by dummy edge and multicasting techniques. We evaluate our algorithm and contrasts on 1 master + 10 slaves cluster. The experiment results show that DCF achieves 23x speedup over ALS on Spark and 18x speedup over gradient descent on Graphlab in public datasets.
+
+\vspace{-5pt}
 
 \begin{keywords} DCF; dataflow; collaborative filtering; gradient descent; asynchronous; fine-grain; parallel;
 \end{keywords}
-
+\vspace{-5pt}
 \end{abstract}
 
 
@@ -55,17 +58,17 @@ Collaborative filtering, widely used in big data applications, is a common techn
 \section{Introduction}
 \vspace{-5pt}
 
-With the immense growth of e-commerce and social network, recommender systems show increasing popularity and importance in recent years. To give more accurate and specific recommendations, collaborative filtering \cite{towards} algorithms are usually considered as effective solutions. Memory based and model based are two categories of collaborative filtering algorithms. \cite{MemoryBasedCF}. Existing studies \cite{MF2009} \cite{recSurvey2013} show that model based algorithms have better prediction accuracy than memory based ones.
+With the immense growth of e-commerce and social network, recommender systems show increasing popularity and importance in recent years. To give more accurate and specific recommendations, collaborative filtering \cite{towards} algorithms are usually considered as effective solutions. Memory based and model based are two categories of collaborative filtering algorithms \cite{MemoryBasedCF}. Existing studies \cite{MF2009} \cite{recSurvey2013} show that model based algorithms have better prediction accuracy than memory based ones.
 Alternating least square (ALS) and gradient descent, two main training algorithms of model based collaborative filtering, are adopted by most big data platforms (e.g. Hadoop \cite{Hadoop}, Spark \cite{SparkMllib}, Graphlab \cite{graphlab}) as the solution for collaborative filtering.
 
-With increasing rating data from massive users, large scale data quantity and high data sparsity become the main bottlenecks of collaborative filtering algorithms in big data scenarios. As the computation complexity of ALS increases with feature dimension quadratically, it shows low performance in large scale datasets \cite{ibm2011}. Compared with ALS, gradient descent has a much lower computation complexity. Current studies \cite{sgdKdd2015} \cite{sgdFast2015} \cite{ibm2011} show that gradient descent outperforms ALS in large scale datasets. However, gradient descent also faces several challenges. \textbf{Firstly, network load becomes the bottleneck because of the high communication complexity. Secondly, individual operations of each data require fine-grain task scheduling. Thirdly, gradient descent can not utilize computing resources well due to high data sparsity.}
+With increasing rating data from massive users, large scale data quantity and high data sparsity become the main bottlenecks of collaborative filtering algorithms. As the computation complexity of ALS increases with feature dimension quadratically, it shows low performance in large scale datasets \cite{ibm2011}. Compared with ALS, gradient descent has a much lower computation complexity. Current studies \cite{sgdKdd2015} \cite{sgdFast2015} \cite{ibm2011} show that gradient descent outperforms ALS in large scale datasets. However, gradient descent also faces several challenges. \textbf{Firstly, network load becomes the bottleneck because of the high communication complexity. Secondly, individual operations of each data require fine-grain task scheduling. Thirdly, gradient descent can not utilize computing resources well due to high data sparsity.}
 
 In this case, we find that dataflow model can partially solve above challenges.
 Dataflow \cite{dataflow} is a parallel computation model which
 supports asynchronous fine-grain task scheduling, making it
 better for sparse dependencies. Fine-grain feature can naturally support individual data operations and asynchronization can fully utilize computing resources in high data sparsity scenario. However, applying dataflow model to gradient descent is not trivial. Fine-grain dependency checking overhead and frequent data movements will also become the bottlenecks of the algorithm.
 
-To tackle above challenges, we propose a dataflow based collaborative filtering (DCF) algorithm to improve the performance of distributed recommender systems. While applying dataflow to gradient descent solves individual operation and data sparsity problems, we propose several optimizations to solve remaining challenges. Dummy edge technique exploits local data transmission in dataflow graph to reduce dependency checking overhead and unnecessary data movements. Multicasting technique avoids sending data to same node for reducing data movements. Mini-batch limits the dependency number of each feature vector to further reduce computation and communication complexity on algorithmic level. The contributions of our work are summarized as follows:
+To tackle above challenges, we propose a dataflow based collaborative filtering (DCF) algorithm to improve the performance of distributed recommender systems. While applying dataflow to gradient descent solves individual operation and data sparsity problems, we propose three optimizations to solve remaining challenges. Dummy edge technique exploits local data transmission in dataflow graph to reduce dependency checking overhead and unnecessary data movements. Multicasting technique avoids sending data to same node for reducing data movements. Mini-batch limits the dependency number of each feature vector to further reduce computation and communication complexity on algorithmic level. The contributions of our work are summarized as follows:
 \vspace{-5pt}
 \begin{itemize}
 \item
@@ -86,26 +89,27 @@ We implement DCF and evaluate it with public rating datasets. The experiment res
 \vspace{-10pt}
 
 \section{Background \& Motivation}
-\vspace{-5pt}
+\vspace{-10pt}
 
 \label{sec:background}
 
 Model based collaborative filtering algorithms are adopted by most distributed recommender systems. As shown in Figure \ref{fig:MF}, Model based collaborative filtering algorithms convert a recommendation issue into a matrix factorization problem, transforming user-item-rating data into two separated matrixes which represent user features and item features.Predicting rates are made by the products of user feature vectors and item feature vectors.
 ALS and gradient descent are two main training algorithms for model based collaborative filtering.
-\vspace{-10pt}
+\vspace{-5pt}
 
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=3in]{pics/MFIntroduction.pdf}
 \vspace{-60pt}
 \caption{Model Based Collaborative Filtering}
+\vspace{-15pt}
 \label{fig:MF}
 \end{figure}
-\vspace{-40pt}
 
+%\vspace{-5pt}
 \subsection{ALS \& Gradient Descent}
 \label{sub:gd}
-%\vspace{-10pt}
+%\vspace{-5pt}
 
 ALS \cite{ALS} converts the non-convex problem into a quadratic problem which can be optimally solved. According to the study of Gemulla et al. \cite{ibm2011}, the computation complexity of ALS is $O(k^3 + k^2(n_u + n_v) + kn_r)$ in one iteration, and it increases with feature dimension $k$ quadratically because user number $n_u$ or item number $n_v$ is much larger than $k$. ALS shows low performance in large scale datasets because of the high computation complexity.
 
@@ -148,14 +152,15 @@ In order to develop high performance collaborative filtering algorithms, we sele
 %\vspace{-15pt}
 %\end{table}
 
-\vspace{-5pt}
+\vspace{-10pt}
 \subsection{Dataflow}
+\vspace{-5pt}
 
 Dataflow \cite{dataflow} is a data-driven computation model optimized for the execution of fine-grain parallel algorithms. Dataflow treats each computation as a separate task and the execution order is maintained by data dependency.
 Dataflow model can be represented as directed acyclic graph (DAG) where nodes
 represent computation and edges represent data dependencies.
 
-The features of dataflow model can partially solve the challenges of gradient descent algorithms well. Fine-grain feature supports individual updating operations of each feature vector. Asynchronization supports sparse dependency well for fully utilizing computing resources. However, applying dataflow model to gradient descent is not straightforward because we need to solve the challenges of dataflow model as well. Fine-grain dependency checking overhead of each feature vector and frequent data movements are the main bottlenecks because of massive rating data.
+The features of dataflow model can partially solve the challenges of gradient descent well. Fine-grain feature supports individual updating operations of each feature vector. Asynchronization supports sparse dependency well for fully utilizing computing resources. However, applying dataflow model to gradient descent is not straightforward because we need to solve the challenges of dataflow model as well. Fine-grain dependency checking overhead of each feature vector and frequent data movements are the main bottlenecks because of massive rating data.
 
 In summary, we propose DCF algorithm with optimizations to solve the challenges of gradient descent and dataflow model.
 
@@ -163,9 +168,10 @@ In summary, we propose DCF algorithm with optimizations to solve the challenges 
 \section{DCF: Dataflow Based Collaborative Filtering Algorithm}
 \vspace{-10pt}
 
-In this section, we give a gradient descent algorithm based on dataflow model. Firstly, we demonstrate the working mechanism of dataflow execution model. Secondly, we transform gradient descent into dataflow graph and explain the working process of it. Thirdly, we propose optimizations to solve the challenges of dataflow model and gradient descent. Finally, we give a detailed DCF algorithm by applying proposed optimizations.
+In this section, we give a gradient descent algorithm based on dataflow execution model. Firstly, we demonstrate the working mechanism of dataflow execution model. Secondly, we transform gradient descent into dataflow graph and explain the working process of it. Thirdly, we propose optimizations to solve the challenges of dataflow model and gradient descent. Finally, we give a detailed DCF algorithm by applying proposed optimizations.
 \vspace{-10pt}
 \subsection{Dataflow Execution Model}
+\vspace{-5pt}
 %Introduce dataflow execution model briefly
 In order to design dataflow algorithm, we introduce the working process of dataflow execution model. As shown in Figure \ref{fig:dataflowModel}, we give an example to explain dataflow execution model explicitly. The figure shows a snapshot of a simple computing progress which consists of several basic operator tasks. Dataflow execution model schedules and processes tasks generated by dataflow graph. Dataflow graph is a directed acyclic graph which edges represent data dependencies and nodes represent functions. The basic data structure transferred in dataflow graph is key-value pair. A task is composed of data from input edges with same key and function of the node. Once dependent data of one node is satisfied, corresponding tasks will be generated and pushed to task queue, such as $-$ task, $\sqrt{ }$ task and $\div$ task. As the input data of $+$ node have different keys, the task will be not generated until dependent data with same key arrive. Processing elements (PE) will fetch new tasks in task queue until tasks are finished.
 
@@ -202,11 +208,11 @@ Meanwhile, node $R$ sends rating data to $U_i$ and $V_i$ for gradient computing,
 \vspace{-20pt}
 \end{figure}
 
-By using dataflow model to implement gradient descent, data sparsity and fine-grain operations can be easily handled. The updating task of each feature vector is scheduled and executed individually. Fine-grain feature naturally supports the updating operation of gradient descent. In addition, the computation load of each feature vector varies in large scale because of the sparse data dependency. Asynchronization feature avoids unnecessary barrier time for waiting hot spot feature vectors in one iteration. As a result, computing resources can be utilized better.
+By using dataflow model to implement gradient descent, data sparsity and fine-grain operations can be easily handled. The updating task of each feature vector is scheduled and executed individually. Fine-grain feature naturally supports the updating operation of gradient descent. In addition, the computation load of each feature vector varies in large scale because of the sparse data dependency. Asynchronization feature avoids unnecessary barrier time for waiting hot spot feature vectors in one iteration. As a result, computing resources can be utilized better. In addition, DCF shows the same convergency performance with original gradient descent algorithms because the deterministic feature of dataflow does not change the algorithm execution logic. 
 
 Though dataflow model supports gradient descent well, high communication complexity and dependency checking overhead are still challenges can not be solved. Hence, we propose three optimizations to solve these challenges.
 
-\vspace{-5pt}
+\vspace{-10pt}
 \subsection{Optimizations}
 \subsubsection{Dummy Edge}
 
@@ -247,12 +253,12 @@ Mini-batch \cite{Dean2012} was firstly proposed to improve the performance by li
 
 We evaluate all optimizations in Section \ref{sub:opt} and the experiments results shows that these optimizations can significantly improve the performance of our algorithm.
 
-\vspace{-10pt}
+\vspace{-15pt}
 \subsection{DCF Algorithm}
-%\vspace{-5pt}
+\vspace{-5pt}
 By Applying dummy edge, multicasting and mini-batch optimizations, we get the finalized algorithm. In order to design a dataflow based algorithm, we need to construct a dataflow graph and give detailed algorithms for each node in the graph. The finalized dataflow graph is shown in Figure \ref{fig:DDCF}. The key nodes are gradient computing nodes ($U$ and $V$), while other nodes are used to preprocess data. As the algorithm logic is same for $U$ and $V$, we give the detailed algorithm of user node $U$.
 
-\vspace{-10pt}
+%\vspace{-10pt}
 \begin{algorithm}
 \caption{Execution Process of DCF User Node $U$}
 \label{code:DCF}
@@ -291,7 +297,7 @@ According to dummy edge technique, user vector $u_i$ and rating $r_{i,j}$ are ob
 \vspace{-10pt}
 \section{Experiments}
 \label{sec:experiment}
-%\vspace{-10pt}
+\vspace{-5pt}
 %\subsection{Experimental Setup}
 
 % TODO: 实现版本的内容根据已有的实验数据调整
@@ -336,7 +342,7 @@ item number & 40,000 & 17,770 & 624,961\\
 rating & 24,000,000 & 99,072,112 & 252,800,275\\
 \hline
 \end{tabular}
-%\vspace{-30pt}
+\vspace{-30pt}
 \end{table}
 
 \subsection{Comparing DCF with Other Distributed Algorithms}
@@ -357,10 +363,16 @@ As rating size is different in three datasets, DCF shows better performance with
 \label{fig:dcfPerformance}
 \end{figure}
 
-\textbf{Accuracy:} We also evaluate the accuracy of three algorithms on Netflix dataset. Root mean square error (RMSE) \cite{towards} is the general metrics for model based collaborative filtering algorithms. The RMSE of DCF, Spark ALS and Graph GD are 0.91, 0.87, 0.93 after 10 iterations. The experiment results show DCF achieves very similar accuracy with significantly improvements in performance.
+\textbf{Accuracy:} We also evaluate the accuracy of three algorithms on Netflix dataset. Root mean square error (RMSE) \cite{towards} is the general metrics for model based collaborative filtering algorithms. With smaller RMSE, the algorithms show better convergency performance. To get RMSE at 0.95, DCF, ALS and Graphlab GD converge with iterations of 9, 6 and 9 respectively. According above data of iteration time, DCF achieves the same accuracy with significantly improvements in performance. In addition, DCF shows the same convergency performance with other distributed gradient descent algorithms.
+
+%\begin{equation}
+%\label{eq:rmse}
+%  RMSE=\sqrt \frac{{\sum_{r_{i,j}\neq 0}{(r_{i,j}-\hat{r}_{i,j})}^2}}{n}
+%\end{equation}
 
 \vspace{-10pt}
 \subsection{Optimizations Evaluation}
+\vspace{-5pt}
 \label{sub:opt}
 
 In this subsection, we evaluate the optimizations of DCF algorithm in Netflix dataset. As shown in left part of Figure \ref{fig:opt}, there are four experiment algorithms used to evaluate dummy edge and multicasting. DCF-Naive represents the algorithm without using proposed optimizations and mini-batch technique is not applied to four experiment algorithms. DCF-Naive with multicasting has a speedup of 2.04 over DCF-Naive. When $k$ increases, it shows better performance, and the speedup goes up to 3.87. The results prove that multicasting can significantly improve the performance by reducing data movements. The speedup of DCF-Naive with dummy edge over DCF-Naive is not distinct. With multicasting, dummy edge can improve the performance by 30\% on average. However, dummy edge improve the performance less than 5\% without multicasting. This difference in two comparisons indicates that data movements is the primary challenge in this algorithm. In conclusion, dummy edge and multicasting can significantly improve the performance.
@@ -403,8 +415,9 @@ As shown in the right part of Figure \ref{fig:opt}, we also evaluate mini-batch 
 %\vspace{-15pt}
 %\label{fig:node}
 %\end{figure}
-
+\vspace{-15pt}
 \subsection{Scalability}
+%\vspace{-5pt}
 \label{sub:sca}
 
 In the last subsection, we evaluate the scalability of DCF in comparison with Spark ALS and Graphlab GD. The evaluation of the three algorithms is conducted on multicore system and distributed system. Yahoo Music has the largest rating size, which leads to high computation and communication load, so we select it as the dataset for this experiment. As shown in left part of Figure \ref{fig:core}, DCF has a near linear scalability when the core number increases, and achieves a speedup of 7.45 on 10 cores. ALS has similar scalability with DCF and achieve a speedup of 6.87 on 10 cores. Graphlab GD has the worst scalability and only achieve a speedup of 1.9 on 10 cores.

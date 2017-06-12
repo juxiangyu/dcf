@@ -43,7 +43,10 @@ University of Delaware, Newark 19716, USA \\
 \maketitle              % typeset the title of the contribution
 \vspace{-20pt}
 \begin{abstract}
-Collaborative filtering, widely used in big data applications, is a common technique in recommender systems. Most big data systems (e.g. Hadoop MR, Spark) use alternating least square (ALS) as the training algorithm for collaborative filtering. Due to the high computation complexity, ALS faces severe performance challenges when data become dramatically larger and sparser. Gradient descent is an alternative training algorithm with lower computation complexity. However, it requires fine-grain operations and large scale data movements. In this paper, we proposed dataflow based collaborative filtering (DCF) training algorithm. DCF exploits fine-grain asynchronous feature of dataflow model to achieve significant performance gain. With our method, the fine-grain overhead of dependency checking and high communication complexity can be optimized by dummy edge and multicasting techniques. We evaluate our algorithm and contrasts on 1 master + 10 slaves cluster. The experiment results show that DCF achieves 23x speedup over ALS on Spark and 18x speedup over gradient descent on Graphlab in public datasets.
+Emerging recommender systems  often adopt collaborative filtering technique to improve the recommending accuracy.  Existing collaborative filtering techniques are implemented with either Alternating Least Square (ALS) algorithm or Gradient Descent (GD) algorithm. However, both of the two algorithms  are not scalable because ALS suffers from high computational complexity and GD suffers from severe synchronization problem and tremendous data movement. To solve the above problem, we proposed a Dataflow-based Collaborative Filtering (DCF) algorithm. 
+DCF exploits fine-grain asynchronous feature of dataflow model to minimize synchronization overhead, leverages mini-batch technique to ..., uses xxx techniques to .... By utilizing all the above techniques, DCF is able to significantly improve the performance of collaborative filtering. Our experiment on a cluster with one master node and ten slave modes show that DCF achieves 23x speedup over ALS on Spark and 18x speedup over gradient descent on Graphlab in public datasets.
+
+%Collaborative filtering, widely used in big data applications, is a common technique in recommender systems. Most big data systems (e.g. Hadoop MR, Spark) use alternating least square (ALS) as the training algorithm for collaborative filtering. Due to the high computation complexity, ALS faces severe performance challenges when data become dramatically larger and sparser. Gradient descent is an alternative training algorithm with lower computation complexity. However, it requires fine-grain operations and large scale data movements. In this paper, we proposed dataflow based collaborative filtering (DCF) training algorithm. DCF exploits fine-grain asynchronous feature of dataflow model to achieve significant performance gain. With our method, the fine-grain overhead of dependency checking and high communication complexity can be optimized by dummy edge and multicasting techniques. We evaluate our algorithm and contrasts on 1 master + 10 slaves cluster. The experiment results show that DCF achieves 23x speedup over ALS on Spark and 18x speedup over gradient descent on Graphlab in public datasets.
 
 \vspace{-5pt}
 
@@ -300,8 +303,8 @@ According to dummy edge technique, user vector $u_i$ and rating $r_{i,j}$ are ob
 \vspace{-5pt}
 %\subsection{Experimental Setup}
 
-% TODO: 实现版本的内容根据已有的实验数据调整
-% 概览，总结实验部分对比内容，横向多平台对比，纵向优化对比，拓展性实验
+% TODO: 脢碌脧脰掳忙卤鸥碌脛脛脷脠脻啪霉鸥脻脪脩脫脨碌脛脢碌脩茅脢媒鸥脻碌梅脮没
+% 啪脜脌脌拢卢脳脺艙谩脢碌脩茅虏驴路脰露脭卤脠脛脷脠脻拢卢潞谩脧貌露脿脝艙脤拧露脭卤脠拢卢脳脻脧貌脫脜禄炉露脭卤脠拢卢脥脴脮鹿脨脭脢碌脩茅
 
 We implement DCF with Java and evaluate its performance on public datasets under both multicore and distributed platforms. Spark ALS \cite{SparkMllib} and Graphlab \cite{graphlab} gradient descent (Graphlab GD) are two most widely used distributed collaborative filtering algorithms, so we select them as the contrasts of DCF. We evaluate the performance of optimizations (dummy edge, multicasting and mini-batch) separately. Scalability of DCF over contrast algorithm are assessed at the last of this section. In all the experiments, we use 1 master + 10 slaves cluster, and the configuration of each node is shown in Table \ref{tab:cluster}. As for parameter setting, default iteration is 10 and mini-batch size is 40.
 \vspace{-15pt}

@@ -65,31 +65,25 @@ With the immense growth of e-commerce and social network, recommender systems ha
 In order to achieve reasonable and user-specific recommendation, emerging recommender systems often adopt collaborative filtering technology that  extracts user characters from multiple aspects and makes recommendation by synthesizing all the characters. Collaborative filtering  can be implemented with either memory-based technique (e.g., ...) or model-based technique (e.g., Alternating Least Square, and Gradient Descent)~\cite{MemoryBasedCF}. Prior work~\cite{MF2009,recSurvey2013} has shown that collaborative filtering system is able to achieve better prediction accuracy adopting model-based techniques. To this end, well-known big data platforms (e.g. Hadoop \cite{Hadoop}, Spark \cite{SparkMllib}, Graphlab \cite{graphlab}) leverage model-based techniques, such as Alternating Least Square and Gradient Descent, to implement collaborative filtering.
 
 However, recommender systems based on collaborative filtering suffer from poor performance in big data era. This is mainly because the volume of rating data from massive users increases dramatically but ALS and gradient descent perform poor when the data set is large. 
-For ALS, its computation complexity increases with feature dimension quadratically~\cite{ibm2011} and this feature of ALS results in its poor scalability. For gradient decent, although it has a much lower computation complexity compared with ALS and outperforms ALS when the dataset is large~\cite{sgdKdd2015,sgdFast2015,ibm2011}, it still suffers from poor performance due to the following challenges. 
-\textbf{First, gradient decent suffers from high communication complexity and the resulted network load becomes the new performance bottleneck. Second, individual operations of each data require fine-grain task scheduling and the scheduling overhead degrades the performance. Third, it is not able to fully utilize computing resources due to the high data sparsity.}
+For ALS, its computation complexity increases with feature dimension quadratically~\cite{ibm2011} and this feature of ALS results in its poor scalability. For gradient descent, although it has a much lower computation complexity compared with ALS and outperforms ALS when the dataset is large~\cite{sgdKdd2015,sgdFast2015,ibm2011}, it still suffers from poor performance due to the following challenges. 
+\textbf{First, gradient descent suffers from high communication complexity and the resulted network load becomes the new performance bottleneck. Second, individual operations of each data require fine-grain task scheduling and the scheduling overhead degrades the performance. Third, gradient descent is not able to fully utilize computing resources due to the high data sparsity.}
 
-In this case, we find that dataflow model can partially solve above challenges.
-Dataflow \cite{dataflow} is a parallel computation model which
-supports asynchronous fine-grain task scheduling, making it
-better for sparse dependencies. Fine-grain feature can naturally support individual data operations and asynchronization can fully utilize computing resources in high data sparsity scenario. However, applying dataflow model to gradient descent is not trivial. Fine-grain dependency checking overhead and frequent data movements will also become the bottlenecks of the algorithm.
-
-To tackle above challenges, we propose a dataflow based collaborative filtering (DCF) algorithm to improve the performance of distributed recommender systems. While applying dataflow to gradient descent solves individual operation and data sparsity problems, we propose three optimizations to solve remaining challenges. Dummy edge technique exploits local data transmission in dataflow graph to reduce dependency checking overhead and unnecessary data movements. Multicasting technique avoids sending data to same node for reducing data movements. Mini-batch limits the dependency number of each feature vector to further reduce computation and communication complexity on algorithmic level. The contributions of our work are summarized as follows:
+In order to solve the above challenges, we propose a {\it Dataflow-based Collaborative Filtering} (DCF) algorithm to improve the performance of distributed recommender systems. Dataflow~\cite{dataflow} is a parallel computation model that
+supports asynchronous fine-grain task scheduling. Prior work~\cite{xxx} has shown that dataflow model is able to minimize communication complexity, reduce scheduling overhead, and increase resource utilization, especially in high data sparsity scenario. However, simply implementing gradient descent using dataflow model is not able to improve the performance of collaborative filtering, because the fine-grain dependency checking overhead and frequent data movements introduced by dataflow model becomes the new bottlenecks.
+To this end, we further propose three optimizations, {\it dummy edge}, {\it multicasting}, and {\it mini-batch}, to minimize the extra overhead caused by dataflow model. More specifically, dummy edge technique exploits local data transmission in dataflow graph to reduce dependency checking overhead and unnecessary data movements. Multicasting technique avoids sending data to same node for reducing data movements. Mini-batch limits the dependency number of each feature vector to further reduce computation and communication complexity on algorithmic level. The main contributions of this paper are summarized as follows:
 \vspace{-5pt}
 \begin{itemize}
-\item
-We design DCF algorithm based on dataflow execution model.
+\item We design a dataflow-based collaborative filtering (DCF) algorithm that performs better than traditional gradient descent-based collaborative algorithm.
 %We exploit the maximum parallelism of the algorithm without hurting convergence because of the deterministic feature of dataflow model.
-Mini-batch technique is applied to DCF algorithm for further reducing computation and communication complexity on algorithmic level
 % adding dummy edge optimization
-\item
-We propose dummy edge technique to handle fine-grain overhead of data dependency checking and reduce unnecessary data movements by exploiting the data locality.
-\item
-We propose multicasting technique to further optimize data movements by reducing the quantity of data transferred by network.
+\item We propose a dummy edge technique that handles fine-grain overhead of data dependency checking and reduce unnecessary data movements by exploiting  data locality.
+\item We propose a multicasting technique that reduces the quantity of data transferred by network.
+\item We apply an mini-batch technique that reduces computation and communication complexity of DCF algorithm.
 \end{itemize}
 \vspace{-5pt}
 %\item  We apply mini-batch technique to DCF for reducing the computation and communication complexity of proposed algorithm with good convergence.
 
-We implement DCF and evaluate it with public rating datasets. The experiment results demonstrate that DCF shows a 23X speedup over ALS on Spark and 18X speedup over gradient descent on Graphlab with similar accuracy.
+We have implemented DCF and evaluated it with public datasets. The experiment results demonstrate that DCF shows a 23X speedup over ALS on Spark and 18X speedup over gradient descent on Graphlab with similar accuracy.
 
 \vspace{-10pt}
 
@@ -98,8 +92,8 @@ We implement DCF and evaluate it with public rating datasets. The experiment res
 
 \label{sec:background}
 
-Model based collaborative filtering algorithms are adopted by most distributed recommender systems. As shown in Figure \ref{fig:MF}, Model based collaborative filtering algorithms convert a recommendation issue into a matrix factorization problem, transforming user-item-rating data into two separated matrixes which represent user features and item features.Predicting rates are made by the products of user feature vectors and item feature vectors.
-ALS and gradient descent are two main training algorithms for model based collaborative filtering.
+Model-based collaborative filtering algorithms are adopted by most of emerging distributed recommender systems. As shown in Figure \ref{fig:MF}, model-based collaborative filtering algorithms convert a recommendation issue into a matrix factorization problem, transforming user-item-rating data into two separated matrixes which represent user features and item features. Predicting rates are made by the products of user feature vectors and item feature vectors.
+ALS and gradient descent are two main training algorithms for model-based collaborative filtering.
 \vspace{-5pt}
 
 \begin{figure}[!htb]

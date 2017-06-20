@@ -16,13 +16,15 @@
 
 @article{SparkMllib,
   title={Mllib: Machine learning in apache spark},
-  author={Meng, Xiangrui and Bradley, Joseph and Yuvaz, B and Sparks, Evan and Venkataraman, Shivaram and Liu, Davies and Freeman, Jeremy and Tsai, D and Amde, Manish and Owen, Sean and others},
+  author={Meng, Xiangrui and Bradley, Joseph and Yuvaz et al.},
   journal={JMLR},
   volume={17},
   number={34},
   pages={1--7},
   year={2016}
 }
+
+%author={Meng, Xiangrui and Bradley, Joseph and Yuvaz, B and Sparks, Evan and Venkataraman, Shivaram and Liu, Davies and Freeman, Jeremy and Tsai, D and Amde, Manish and Owen, Sean and others},
 
 @article{matrix1,
   title={Matrix computation on distributed memory multiprocessors},
@@ -93,7 +95,7 @@
 @inproceedings{SparkCF,
   title={Collaborative filtering for implicit feedback datasets},
   author={Hu, Yifan and Koren, Yehuda and Volinsky, Chris},
-  booktitle={2008 Eighth IEEE International Conference on Data Mining},
+  booktitle={ICDM},
   pages={263--272},
   year={2008},
   organization={Ieee}
@@ -158,6 +160,7 @@
 @misc{Hadoop,
   title = {Apache Hadoop Project},
   howpublished = {\url{http://hadoop.apache.org/}},
+  year = {2017}
 }
 
 @misc{Spark,
@@ -199,7 +202,7 @@
 @inproceedings{sparkMatrix2016,
   title={Matrix computations and optimization in apache spark},
   author={Bosagh Zadeh, Reza and Meng, Xiangrui and Ulanov, Alexander and Yavuz, Burak and Pu, Li and Venkataraman, Shivaram and Sparks, Evan and Staple, Aaron and Zaharia, Matei},
-  booktitle={Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  booktitle={SIGKDD},
   pages={31--38},
   year={2016},
   organization={ACM}
@@ -208,7 +211,7 @@
 @inproceedings{sgdKdd2015,
   title={Fast and robust parallel sgd matrix factorization},
   author={Oh, Jinoh and Han, Wook-Shin and Yu, Hwanjo and Jiang, Xiaoqian},
-  booktitle={Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  booktitle={SIGKDD},
   pages={865--874},
   year={2015},
   organization={ACM}
@@ -239,7 +242,7 @@
 @inproceedings{ibm2011,
   title={Large-scale matrix factorization with distributed stochastic gradient descent},
   author={Gemulla, Rainer and Nijkamp, Erik and Haas, Peter J and Sismanis, Yannis},
-  booktitle={Proceedings of the 17th ACM SIGKDD international conference on Knowledge discovery and data mining},
+  booktitle={SIGKDD},
   pages={69--77},
   year={2011},
   organization={ACM}
@@ -276,12 +279,14 @@
 
 @inproceedings{dataFrame,
   title={Spark sql: Relational data processing in spark},
-  author={Armbrust, Michael and Xin, Reynold S and Lian, Cheng and Huai, Yin and Liu, Davies and Bradley, Joseph K and Meng, Xiangrui and Kaftan, Tomer and Franklin, Michael J and Ghodsi, Ali and others},
-  booktitle={Proceedings of the 2015 ACM SIGMOD International Conference on Management of Data},
+  author={Armbrust, Michael and Xin, Reynold S and Lian et al.},
+  booktitle={SIGMOD},
   pages={1383--1394},
   year={2015},
   organization={ACM}
 }
+
+%author={Armbrust, Michael and Xin, Reynold S and Lian, Cheng and Huai, Yin and Liu, Davies and Bradley, Joseph K and Meng, Xiangrui and Kaftan, Tomer and Franklin, Michael J and Ghodsi, Ali and others},
 
 @inproceedings{sgdGPU,
   title={Efficient parallel Stochastic Gradient Descent for matrix factorization using GPU},
@@ -295,17 +300,80 @@
 @inproceedings{convergence,
   title={Efficient mini-batch training for stochastic optimization},
   author={Li, Mu and Zhang, Tong and Chen, Yuqiang and Smola, Alexander J},
-  booktitle={Proceedings of the 20th ACM SIGKDD international conference on Knowledge discovery and data mining},
+  booktitle={SIGKDD},
   pages={661--670},
   year={2014},
   organization={ACM}
 }
 
-@inproceedings{convergence,
-  title={Efficient mini-batch training for stochastic optimization},
-  author={Li, Mu and Zhang, Tong and Chen, Yuqiang and Smola, Alexander J},
-  booktitle={Proceedings of the 20th ACM SIGKDD international conference on Knowledge discovery and data mining},
-  pages={661--670},
-  year={2014},
-  organization={ACM}
+@Article{StarPU,
+author = {C{\'e}dric Augonnet and Samuel Thibault and Raymond Namyst and Pierre-Andr{\'e} Wacrenier},
+title = {{StarPU: A Unified Platform for Task Scheduling on Heterogeneous Multicore Architectures}},
+journal = {Euro-Par },
+volume = 23,
+issue = 2,
+pages = {187--198},
+year = 2011,
+month = FEB,
+publisher = {John Wiley & Sons, Ltd.},
+doi = {10.1002/cpe.1631},
+KEYWORDS = {General Presentations,StarPU}
 }
+
+@inproceedings{tensorflow,
+  title={TensorFlow: A system for large-scale machine learning},
+  author={Abadi, Mart{\'\i}n and Barham, Paul and Chen et al.},
+  booktitle={OSDI. Savannah, Georgia, USA},
+  year={2016}
+}
+
+%author={Abadi, Mart{\'\i}n and Barham, Paul and Chen, Jianmin and Chen, Zhifeng and Davis, Andy and Dean, Jeffrey and Devin, Matthieu and Ghemawat, Sanjay and Irving, Geoffrey and Isard, Michael and others},
+
+@inproceedings{ssp,
+  title={On convergence of model parallel proximal gradient algorithm for stale synchronous parallel system},
+  author={Zhou, Yi and Yu, Yaoliang and Dai, Wei and Liang, Yingbin and Xing, Eric},
+  booktitle={Artificial Intelligence and Statistics},
+  pages={713--722},
+  year={2016}
+}
+
+@inproceedings{ps,
+  title={Scaling Distributed Machine Learning with the Parameter Server.},
+  author={Li, Mu and Andersen, David G and Park, Jun Woo and Smola et al.}
+  booktitle={OSDI},
+  volume={14},
+  pages={583--598},
+  year={2014}
+}
+
+%author={Li, Mu and Andersen, David G and Park, Jun Woo and Smola, Alexander J and Ahmed, Amr and Josifovski, Vanja and Long, James and Shekita, Eugene J and Su, Bor-Yiing},
+
+@inproceedings{strads,
+  title={STRADS: a distributed framework for scheduled model parallel machine learning},
+  author={Kim, Jin Kyu and Ho, Qirong and Lee, Seunghak and Zheng, Xun and Dai, Wei and Gibson, Garth A and Xing, Eric P},
+  booktitle={Eurosys},
+  pages={5},
+  year={2016},
+  %organization={ACM}
+}
+
+@article{petuum,
+  title={Petuum: A new platform for distributed machine learning on big data},
+  author={Xing, Eric P and Ho, Qirong and Dai, Wei and Kim, Jin Kyu and Wei, Jinliang and Lee, Seunghak and Zheng, Xun and Xie, Pengtao and Kumar, Abhimanu and Yu, Yaoliang},
+  journal={IEEE Transactions on Big Data},
+  volume={1},
+  number={2},
+  pages={49--67},
+  year={2015},
+  publisher={IEEE}
+}
+
+@inproceedings{Dean2012,
+  title={Large scale distributed deep networks},
+  author={Dean, Jeffrey and Corrado, Greg and Monga et al.},
+  booktitle={Advances in neural information processing systems},
+  pages={1223--1231},
+  year={2012}
+}
+
+author={Dean, Jeffrey and Corrado, Greg and Monga, Rajat and Chen, Kai and Devin, Matthieu and Mao, Mark and Senior, Andrew and Tucker, Paul and Yang, Ke and Le, Quoc V and others},

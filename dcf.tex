@@ -343,6 +343,7 @@ In this subsection, we evaluate the optimizations of DCF algorithm in Netflix da
 \includegraphics[width=2in]{pics/mb.pdf}
 \vspace{-10pt}
 \caption{Optimizations Evaluation of DCF}
+\vspace{-5pt}
 \label{fig:opt}
 \end{figure}
 
@@ -369,14 +370,14 @@ In distributed system, we evaluate the scalability on 10 nodes. As shown in the 
 
 In conclusion, DCF shows the best scalability in three algorithms and has superior performance in both multicore system and distributed system.
 
-\vspace{-10pt}
+\vspace{-15pt}
 \section{Related Work}
 \label{sec:relatedWork}
-\vspace{-5pt}
+\vspace{-10pt}
 In recent years, parallel researches on collaborative filtering were developing parallel algorithms for ALS and GD. Mahout, the machine learning library for Hadoop \cite{Hadoop}, implemented model-based algorithms with MapReduce \cite{MapReduce} computation model. Spark \cite{SparkMllib} implemented ALS \cite{SparkCF} and utilized its Dataframe \cite{dataFrame}  data structure to improve the performance. However, high computation complexity of ALS becomes the bottleneck of these systems.
 
 In order to achieve higher performance, prior studies focused on parallel GD algorithm for its low computation complexity. Graphlab \cite{graphlab}, a distributed graph computing system, provided GD based on its vertex programming model. Due to massive data movement between nodes, graphlab shows low performance in large data set because of the network bottleneck.
-In recent years, parameter server architecture were proposed to support distributed GD. STRADS \cite{strads} in Petuum was proposed to schedule model parallel machine learning algorithms on distributed platform. Parameter Server \cite{ps} proposed bounded synchronous technique and several network optimizations to support GD. As for these parameter sever architecture based systems, the task scheduling level is on data partition but not on key-value pair. Tensorflow \cite{tensorflow}, another dataflow inspired system, only adopted pipelining feature of dataflow model to support GD. StarPU \cite{StarPU} transformed the algorithm into DAG and executed tasks according to the DAG, but it focused on the multicore system rather than distributed system.
+In recent years, parameter server architecture were proposed to support distributed GD. STRADS \cite{strads} in Petuum was proposed to schedule model parallel machine learning algorithms on distributed platform. Parameter Server \cite{ps} proposed bounded synchronous technique and several network optimizations to support GD. As for these parameter sever architecture based systems, the task scheduling level is on data partition but not on key-value pair. Tensorflow \cite{tensorflow}, another dataflow inspired system, only adopted pipelining feature of dataflow model to support GD. StarPU \cite{StarPU} transformed the algorithm into DAG and executed tasks according to the DAG, but it mainly focused on the multicore system rather than distributed system.
 
 There are also studies exploiting parallelism on algorithmic level rather than runtime system. Jinoh et al.~\cite{sgdKdd2015} proposed MLGF-MF for partitioning rating matrix and asynchronously computing gradients, but the partition strategy is not fit for distributed systems due to the network load. Yong Zhuang et al.~\cite{sgdFast2015} proposed FPSGD and used locking free strategy to improve the performance, but it changed the original algorithm logic of GD. In addition, these parallel collaborative filtering algorithms were developed on multicore systems but not distributed systems.
 

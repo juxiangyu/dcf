@@ -56,7 +56,7 @@ More specifically, DCF exploits fine-grain asynchronous feature of dataflow mode
 
 
 
-\vspace{-30pt}
+%\vspace{-30pt}
 \section{Introduction}
 \vspace{-5pt}
 
@@ -69,7 +69,7 @@ For ALS, its computation complexity increases with feature dimension quadratical
 \textbf{First, GD suffers from high communication complexity and the resulted network load becomes the new performance bottleneck. Second, individual operations of each data require fine-grain task scheduling and the scheduling overhead degrades the performance. Third, GD is not able to fully utilize computing resources due to the high data sparsity.}
 
 In order to solve the above challenges, we propose a {\it Dataflow-based Collaborative Filtering} (DCF) algorithm to improve the performance of distributed recommender systems. Dataflow~\cite{dataflow} is a parallel computation model that
-supports asynchronous fine-grain task scheduling. Prior work~\cite{codelet} has shown that dataflow model is able to minimize communication complexity, reduce synchronization overhead, and increase resource utilization, especially in high data sparsity scenario. However, simply implementing GD using dataflow model is not able to improve the performance of collaborative filtering, because the fine-grain dependency checking overhead and frequent data movement introduced by dataflow model becomes the new bottlenecks.
+supports asynchronous fine-grain task scheduling. Prior work~\cite{codelet} has shown that dataflow model is able to minimize communication complexity, reduce synchronization overhead, and increase resource utilization, especially in high data sparsity scenario. However, simply implementing GD with dataflow model is not able to improve the performance of collaborative filtering, because the fine-grain dependency checking overhead and frequent data movement introduced by dataflow model becomes the new bottlenecks.
 To this end, we further propose two optimizations ({\it dummy edge} and {\it multicasting}) to minimize the extra overhead caused by dataflow model, and apply {\it mini-batch} technique to optimize the performance of GD. More specifically, dummy edge technique exploits local data transmission in dataflow graph to reduce dependency checking overhead and unnecessary data movement. Multicasting technique avoids sending data to same node for reducing data movement. Mini-batch limits the dependency number of each feature vector to further reduce computation and communication complexities on algorithmic level. The main contributions of this paper are summarized as follows:
 
 \vspace{-5pt}
@@ -110,7 +110,7 @@ ALS and GD are two main training algorithms for model-based collaborative filter
 
 ALS \cite{ALS} converts the matrix factorization problem into a quadratic problem which can be optimally solved. According to the study of Gemulla et al. \cite{ibm2011}, the computation complexity of ALS is $O(k^3 + k^2(n_u + n_v) + kn_r)$ in one iteration, and it increases with feature dimension $k$ quadratically because user number $n_u$ or item number $n_v$ is much larger than $k$. ALS shows low performance in large scale datasets because of the high computation complexity.
 
-GD is an alternating training algorithm for model-based collaborative filtering. According to Eq. \ref{eq:gd1} and Eq. \ref{eq:gd2},
+GD is an alternative training algorithm for model-based collaborative filtering. According to Eq. \ref{eq:gd1} and Eq. \ref{eq:gd2},
 user feature vector $u_i$ or item feature vector $v_j$ can be updated by given ratings $r_{i,j}$ and dependent feature vectors where $\lambda$ represents the regularization parameter. The computation complexity of GD is $O(k\bar{d}(n_u + n_v))$ in one iteration where $\bar{d}$ represents the average dependency number. Compared with ALS, GD has a lower computation complexity. However, GD also faces several challenges. Firstly, it requires fine-grain operations because each user feature vector $u_i$ or item feature vector $v_j$ can be updated individually and asynchronously. Secondly, high data sparsity causes load imbalance because dependency number of each feature vector varies in large scale. Thirdly, the communication complexity is $O(k\bar{d}(n_u + n_v))$ and it leads to high network load.
 \vspace{-5pt}
 
@@ -126,9 +126,9 @@ v_j = v_j - \alpha (\sum_{r_{i,j} \neq 0}(u^T_iv_j - r_{i,j})u_i + \lambda v_j)
 \end{equation}
 \vspace{-10pt}
 
-In order to develop a high performance collaborative filtering algorithm, we select GD as the training algorithm for its low computation complexity. In addition, we need to find proper parallel model to solve its challenges. As a result, dataflow model is selected because it can solve the challenges of GD.
+In order to develop a high performance collaborative filtering algorithm, we select GD as the training algorithm for its low computation complexity. In addition, dataflow model is selected to solve the challenges of GD.
 
-\vspace{-10pt}
+\vspace{-15pt}
 \subsection{Dataflow}
 \vspace{-5pt}
 
@@ -137,9 +137,9 @@ Dataflow model can be represented as directed acyclic graph (DAG) where nodes
 represent computation and edges represent data dependencies.
 
 According to the work of Zuckerman et al.~\cite{codelet},
-the features of dataflow model can solve the challenges of GD well. Fine-grain feature supports individual updating operations of each feature vector. Asynchronization supports sparse dependencies well for fully utilizing computing resources. However, applying dataflow model to GD is not straightforward because we need to solve the challenges of dataflow model as well. Fine-grain dependency checking overhead and frequent data movement are the main bottlenecks because of massive rating data. In summary, we propose DCF algorithm with optimizations to solve the challenges of GD and dataflow model.
+the features of dataflow model can solve the challenges of GD well. Fine-grain feature supports individual updating operations of each feature vector. Asynchronization supports sparse dependencies well for fully utilizing computing resources. However, applying dataflow model to GD is not straightforward because we need to solve the challenges of dataflow model as well. Fine-grain dependency checking overhead and frequent data movement are the main bottlenecks because of massive rating data. As a result, we propose DCF algorithm with optimizations to solve the challenges of GD and dataflow model.
 
-\vspace{-15pt}
+\vspace{-10pt}
 \section{DCF: Dataflow-based Collaborative Filtering Algorithm}
 \vspace{-10pt}
 
@@ -165,7 +165,7 @@ In order to design dataflow algorithm, we introduce the working process of dataf
 \subsection{DCF Dataflow Graph}
 \vspace{-5pt}
 In order to design DCF algorithm, we need to transform the algorithm into dataflow graph expression. As shown in Figure \ref{fig:gdGraph}, we construct dataflow graph of GD according to Eq. \ref{eq:gd1} and Eq. \ref{eq:gd2}. Node $R$ transforms the input data into the triplet form $<user$ $id$, $item$ $id$, $rating>$, and sends user id and item id information to $InitU$ and $InitV$ for initializing feature vectors.
-Meanwhile, node $R$ sends rating data to $U_i$ and $V_i$ for gradient computing, where $U_i$ and $V_i$ represent the $i$th iteration of user node and item node. After initializing feature vectors, $InitU$ and $InitV$ send feature vectors to $U_1$ and $V_1$. In each iteration $i$, $U_i$ and $V_i$ are used to compute the gradients and update feature vectors until convergence. After the gradient computing tasks are finished in last iteration $n$ , $U_n$ and $V_n$ output the trained feature vectors.
+Meanwhile, node $R$ sends rating data to $U_i$ and $V_i$ for gradient computing, where $U_i$ and $V_i$ represent user node and item node in the $i$th iteration. After initializing feature vectors, $InitU$ and $InitV$ send feature vectors to $U_1$ and $V_1$. In each iteration $i$, $U_i$ and $V_i$ are used to compute the gradients and update feature vectors until convergence. After the gradient computing tasks are finished in last iteration $n$ , $U_n$ and $V_n$ output the trained feature vectors.
 
 \vspace{-15pt}
 
@@ -188,9 +188,11 @@ Meanwhile, node $R$ sends rating data to $U_i$ and $V_i$ for gradient computing,
 
 \vspace{-5pt}
 
-By using dataflow model to implement GD, data sparsity and fine-grain operations can be easily handled. Gradient computing task of each feature vector is scheduled and executed individually. Fine-grain feature naturally supports the updating operation of GD. In addition, the computation load of each feature vector varies in large scale because of the sparse data dependencies. Asynchronization feature avoids unnecessary barrier time for waiting hot spot feature vectors in one iteration. As a result, computing resources can be utilized better.
+By using dataflow model to implement GD, fine-grain operations and data sparsity can be easily handled. The fine-grain operations of GD are the gradient computing tasks of feature vectors. Fine-grain feature of dataflow model supports these tasks to be scheduled and executed individually. Due to the high data sparsity, the computation load of each feature vector varies in large scale. Asynchronization feature of dataflow model avoids unnecessary barrier time caused by sparse data, and better utilizes the computing resources.
 
-Due to the deterministic feature of dataflow model, DCF transforms original GD algorithm into dataflow graph without changing the algorithm logic. Hence, DCF shows the same convergency performance with other GD algorithms. Though dataflow model supports GD well, high communication complexity and dependency checking overhead are still challenges can not be solved. Hence, we propose three optimizations to solve these challenges.
+%Gradient computing task of each feature vector is scheduled and executed individually. Fine-grain feature naturally supports the updating operation of GD. In addition, the computation load of each feature vector varies in large scale because of the sparse data dependencies. Asynchronization feature avoids unnecessary barrier time for waiting hot spot feature vectors in one iteration. As a result, computing resources can be utilized better.
+
+Due to the deterministic feature of dataflow model, DCF transforms original GD algorithm into dataflow graph without changing the algorithm logic. Hence, DCF shows the same convergency performance with other GD algorithms. Though dataflow model supports GD well, high communication complexity and dependency checking overhead are still need be solved. Hence, we propose the following three optimizations.
 
 \vspace{-10pt}
 \subsection{Optimizations}
@@ -222,20 +224,20 @@ There is no dependency checking operation of every node in reconstructed dataflo
 
 \vspace{-20pt}
 \subsubsection{Multicasting}
-With dummy edge, data movement can be reduced by avoiding sending local data. However, the quantity of data transferred by normal edges is much more than that by two dummy edges. Hence, we propose multicasting strategy to further optimize the data movement. As shown in Figure \ref{fig:multicasting}, global sending means sending data to different nodes in the cluster through network, while local sending means sending data in the node without network. In the scenario of sending data from $V$ to $U$, typical sending strategy of dataflow model requires data to be sent to the location of dependent users by global sending directly. In this process, key-value pairs with the same value may be sent to different locations on the same node. For example, the key-value pairs sent to $u_1$ and $u_2$ on node 1 have the same value $v_i$. Repetitive data sent to the same node will increase the network load of the algorithm. As for multicasting strategy, key-value pairs of same feature vectors are sent to the nodes which have dependent feature vectors by global sending. For example, $v_i$ depends on user $u_1$, $u_2$ and $u_6$, and there is no dependent data on node 2. Key-value pairs of $v_i$ are sent to node 1 and 3 first by global sending. Then, each node sends the key-value pairs to dependent feature vectors by local sending. $u_1$ and $u_2$ get the key-value pair from node 1 and $u_6$ gets the key-value pair from node 3.
+With dummy edge, data movement can be reduced by avoiding sending local data. However, the quantity of data transferred by normal edges is much more than that by two dummy edges. Hence, we propose multicasting strategy to further optimize the data movement. As shown in Figure \ref{fig:multicasting}, global sending means sending data to different nodes in the cluster through network, while local sending means sending data in the node without network. In the scenario of sending data from $V$ to $U$, typical sending strategy of dataflow model sends data to the location of dependent users by global sending directly. In this process, key-value pairs with the same value may be sent to different locations on the same node. For example, the key-value pairs sent to $u_1$ and $u_2$ on node 1 have the same value $v_i$. Repetitive data sent to the same node will increase the network load of the algorithm. As for multicasting strategy, key-value pairs of same feature vectors are sent to the nodes which have dependent feature vectors by global sending. For example, $v_i$ depends on user $u_1$, $u_2$ and $u_6$, and there is no dependent data on node 2. Key-value pairs of $v_i$ are sent to node 1 and 3 first by global sending. Then, each node sends the key-value pairs to dependent feature vectors by local sending. $u_1$ and $u_2$ get the key-value pair from node 1 and $u_6$ gets the key-value pair from node 3.
 
 Compared with original communication complexity described in Section \ref{sub:gd}, the complexity by using multicasting is $O(ck(n_u + n_v))$ where $c$ represents the node number of cluster. The complexity is reduced by $\bar{d}/c$ times where average dependency number $\bar{d}$ increases with rating data linearly. In conclusion, multicasting can significantly reduce data movement in large scale dataset.
 \vspace{-10pt}
 \subsubsection{Mini-batch}
 
-Mini-batch \cite{Dean2012} was firstly proposed to reduce the computation complexity by limiting data batch size. In collaborative filtering, batch size of data is the dependency number of each feature vector, and feature vectors require to be sent after updating operations. Hence, we apply mini-batch technique to our algorithm for reducing computation and communication complexities by limiting dependency number of each feature vector. However, applying mini-batch is not straightforward because the dependency number of each feature vector is different. As a result, we select the minimal number between dependency number $d$ and given mini-batch size $b$ as the final dependency number for each feature vector. In large rating scenario, the mini-batch $b$ is always set as the final dependency number because real dependency number $d$ is larger than mini-batch size $b$. The computation and communication complexities of one iteration are $O(kb(n_u + n_v))$, and the complexities are reduced by $\bar{d}/b$ times where average dependency number $\bar{d}$ increases with rating number linearly. As a result, mini-batch technique can significantly reduce the computation and communication complexities in large scale datasets.
+Mini-batch \cite{Dean2012} was firstly proposed to reduce the computation complexity by limiting data batch size. In collaborative filtering, batch size of data is the dependency number of each feature vector, and feature vectors require to be sent after updating operations. Hence, we limit dependency number of each feature vector for reducing computation and communication complexities. As the dependency number of each feature vector is different, we select the minimal number between dependency number $d$ and given mini-batch size $b$ as the final dependency number for each feature vector. Specially in large rating scenario, the mini-batch $b$ is always set as the final dependency number because real dependency number $d$ is larger than mini-batch size $b$. The computation and communication complexities of one iteration are $O(kb(n_u + n_v))$, and the complexities are reduced by $\bar{d}/b$ times where average dependency number $\bar{d}$ increases with rating number linearly. As a result, mini-batch technique can significantly reduce the computation and communication complexities in large scale datasets.
 
 We evaluate all optimizations in Section \ref{sub:opt} and the experiments results demonstrate that these optimizations can significantly improve the performance of our algorithm.
 
 \vspace{-12pt}
 \subsection{DCF Algorithm}
 \vspace{-3pt}
-By Applying dummy edge, multicasting and mini-batch optimizations, we get the finalized algorithm. In order to design a dataflow-based algorithm, we need to construct a dataflow graph and give detailed algorithms of each node in the graph. The finalized dataflow graph is shown in Figure \ref{fig:DDCF}. The key nodes are gradient computing nodes ($U$ and $V$), while other nodes are used to preprocess data. As the algorithm logic is same for $U$ and $V$, we give the detailed algorithm of user node $U$.
+By applying dummy edge, multicasting and mini-batch optimizations, we get the finalized algorithm. In order to design a dataflow-based algorithm, we need to construct a dataflow graph and give detailed algorithms of each node in the graph. The finalized dataflow graph is shown in Figure \ref{fig:DDCF}. The key nodes are gradient computing nodes ($U$ and $V$), while other nodes are used to preprocess data. As the algorithm logic is same for $U$ and $V$, we give the detailed algorithm of user node $U$.
 
 %\vspace{-10pt}
 \begin{algorithm}
@@ -327,14 +329,14 @@ As rating size is different in three datasets, DCF shows better performance with
 \label{fig:dcfPerformance}
 \end{figure}
 
-\textbf{Accuracy:} We also evaluate the accuracy of three algorithms on Netflix dataset. Root mean square error (RMSE) \cite{towards} is the general metrics for model-based collaborative filtering algorithms. With smaller RMSE, the algorithms show better convergency performance. To get RMSE at 0.95, ALS, Graphlab GD and DCF converge with iterations of 6, 9 and 9 respectively. According to above data of iteration time, DCF achieves the same accuracy with 2.66x speedup over ALS and 8.51x speedup over Graphlab GD. In addition, DCF shows the same convergency performance with other distributed GD algorithms.
+\textbf{Accuracy:} We also evaluate the accuracy of three algorithms on Netflix dataset. Root mean square error (RMSE) \cite{towards} is the general metrics for model-based collaborative filtering algorithms. With smaller RMSE, the algorithms show better convergency performance. To get RMSE at 0.95, ALS, Graphlab GD and DCF converge with iterations of 6, 9 and 9 respectively. DCF shows the same convergency performance with other distributed GD algorithms. According to above data of iteration time, DCF achieves the same accuracy with 2.66x speedup over ALS and 8.51x speedup over Graphlab GD.
 
 \vspace{-15pt}
 \subsection{Optimizations Evaluation}
 \vspace{-5pt}
 \label{sub:opt}
 
-In this subsection, we evaluate the optimizations of DCF algorithm in Netflix dataset. As shown in the left part of Figure \ref{fig:opt}, there are four experiment algorithms used to evaluate dummy edge and multicasting. DCF-Naive represents the algorithm without using proposed optimizations and mini-batch technique is not applied to four experiment algorithms. DCF-Naive with multicasting has a average speedup of 2.04 over DCF-Naive. When $k$ increases, it shows better performance, and the speedup goes up to 3.87. The results prove that multicasting can significantly improve the performance by reducing data movement. The speedup of DCF-Naive with dummy edge over DCF-Naive is not distinct. With multicasting, dummy edge can improve the performance by 30\% on average. However, dummy edge improve the performance less than 5\% without multicasting. This difference in two comparisons indicates that data movement is the primary challenge in this algorithm. In conclusion, dummy edge and multicasting can significantly improve the performance.
+In this subsection, we evaluate the optimizations of DCF algorithm in Netflix dataset. As shown in the left part of Figure \ref{fig:opt}, there are four experiment algorithms used to evaluate dummy edge and multicasting. DCF-Naive represents the algorithm without using proposed optimizations and mini-batch technique is not applied to four experiment algorithms. DCF-Naive with multicasting has a average speedup of 2.04 over DCF-Naive. When $k$ increases, the speedup goes up to 3.87. The results prove that multicasting can significantly improve the performance by reducing data movement. The speedup of DCF-Naive with dummy edge over DCF-Naive is less than 5\%. With multicasting, dummy edge can improve the performance by 30\% on average. This difference indicates that data movement is the primary challenge in this algorithm. In conclusion, dummy edge and multicasting can significantly improve the performance.
 
 
 \begin{figure}[!t]
@@ -347,7 +349,7 @@ In this subsection, we evaluate the optimizations of DCF algorithm in Netflix da
 \label{fig:opt}
 \end{figure}
 
-As shown in the right part of Figure \ref{fig:opt}, we also evaluate mini-batch technique of DCF. $b = 1$ is a special case to set the dependency number to minimal value. Compared $b=40$ with not using mini-batch situation, the speedup of using mini-batch strategy ranges from 1.32 to 3.19, and the average speedup is 2.08. The results demonstrate that mini-batch technique can improve the performance by optimizing computation and communication complexities. With decreasing $b$, mini-batch technique does not show obvious improvement when $b$ is less than 40. $b=40$ situation takes 31.02\% longer training time than $b=1$, which can be considered as a similar performance with $b=1$. However, the convergence speed of $b=1$ is much lower than other situations. Empirically, we set $b=40$ for balancing the performance and the convergency.
+As shown in the right part of Figure \ref{fig:opt}, we also evaluate mini-batch technique of DCF based on dummy edge and multicasting optimizations. $b = 1$ is a special case to set the dependency number to minimal value. Comparing $b=40$ to without using mini-batch situation, the speedup of using mini-batch strategy ranges from 1.32 to 3.19, and the average speedup is 2.08. The results demonstrate that mini-batch technique can improve the performance by optimizing computation and communication complexities. With decreasing $b$, mini-batch technique does not show obvious improvement when $b$ is less than 40. $b=40$ situation takes 31.02\% longer training time than $b=1$, which can be considered as a similar performance with $b=1$. However, the convergence speed of $b=1$ is much lower than other situations. Empirically, we set $b=40$ for balancing the performance and the convergency.
 
 \begin{figure}[!t]
 \centering
@@ -388,7 +390,7 @@ There are also studies exploiting parallelism on algorithmic level rather than r
 Dataflow model is a natural parallel model which can exploit maximum
 parallelism of algorithms by analyzing data dependency to asynchronously
 execute tasks in runtime execution. At present, recommender
-systems are facing challenges of the increasing rating size and low performance of current big data systems. We design and implement {\it Dataflow-based Collaborative Filtering} (DCF) algorithm to improve the performance. We propose three optimizations ({\it dummy edge, multicasting and mini-bach}) to further improve our design by avoiding fine-grain overhead and reducing computation load and data movement. The experiment results illustrate that DCF can significantly improve the performance on distributed system.
+systems are facing challenges from the increasing data size. We design and implement {\it Dataflow-based Collaborative Filtering} (DCF) algorithm to improve the performance. We propose three optimizations ({\it dummy edge, multicasting and mini-bach}) to further improve our design by avoiding fine-grain overhead and reducing computation load and data movement. The experiment results illustrate that DCF can significantly improve the performance on distributed system.
 
 \vspace{-10pt}
 \bibliographystyle{splncs03}
